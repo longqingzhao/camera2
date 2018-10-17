@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Camera2ManagerApi implements ControlCamera, com.example.camera2api.CameraManager {
+public class Camera2ManagerApi implements ControlCamera, com.zhaolongqing.zlqpc.camera2api.CameraManager {
 
     private static final String TAG = "Camera2ManagerApi";
     private static Camera2ManagerApi camera2ManagerApi = new Camera2ManagerApi();

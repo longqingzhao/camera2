@@ -1,1 +1,1 @@
-include ':app', ':camera2api'
+include ':camera2api', ':myapplication'
