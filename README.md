@@ -3,7 +3,7 @@
 使用前需要logger库，权限请求。
 
 dependencies {
-	implementation 'com.github.zhaolongqing:camera2:v1.0'
+	implementation 'com.github.zhaolongqing:camera2:1.0'
 	}
 	
 	
