@@ -3,7 +3,7 @@ package com.zhaolongqing.zlqpc.camera2api;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;
 
-public interface CameraManager {
+public interface CameraSet {
 
     void setCameraDevice(CameraDevice cameraDevice);
     void setSession(CameraCaptureSession cameraCaptureSession);

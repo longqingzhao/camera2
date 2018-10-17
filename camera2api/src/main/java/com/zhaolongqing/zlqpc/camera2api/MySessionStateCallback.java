@@ -12,14 +12,14 @@ import com.orhanobut.logger.Logger;
 public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
 
     private static final String TAG = "MySessionStateCallback";
-    private CameraManager cameraManager;
+    private CameraSet cameraSet;
     private final CaptureRequest.Builder builder;
     private final Handler handler;
     private boolean isRecord;
     private MediaRecorder mediaRecorder;
 
-    public MySessionStateCallback(CameraManager cameraManager, CaptureRequest.Builder builder, Handler handler, boolean isRecord, MediaRecorder mediaRecorder) {
-        this.cameraManager = cameraManager;
+    public MySessionStateCallback(CameraSet cameraSet, CaptureRequest.Builder builder, Handler handler, boolean isRecord, MediaRecorder mediaRecorder) {
+        this.cameraSet = cameraSet;
         this.builder = builder;
         this.handler = handler;
         this.isRecord = isRecord;
@@ -28,7 +28,7 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
 
     @Override
     public void onConfigured(@NonNull CameraCaptureSession session) {
-        cameraManager.setSession(session);
+        cameraSet.setSession(session);
         try {
             session.setRepeatingRequest(builder.build(), null, handler);
         } catch (CameraAccessException e) {

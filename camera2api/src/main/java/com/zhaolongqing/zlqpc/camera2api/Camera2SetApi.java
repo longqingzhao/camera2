@@ -31,10 +31,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Camera2ManagerApi implements ControlCamera, com.zhaolongqing.zlqpc.camera2api.CameraManager {
+public class Camera2SetApi implements ControlCamera, CameraSet {
 
-    private static final String TAG = "Camera2ManagerApi";
-    private static Camera2ManagerApi camera2ManagerApi = new Camera2ManagerApi();
+    private static final String TAG = "Camera2SetApi";
+    private static Camera2SetApi camera2ManagerApi = new Camera2SetApi();
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
     private WeakReference<Activity> activityWeakReference;
@@ -46,7 +46,7 @@ public class Camera2ManagerApi implements ControlCamera, com.zhaolongqing.zlqpc.
     private CaptureRequest.Builder mPreviewBuilder;
     private String absolutePath;
 
-    public static Camera2ManagerApi getCamera2ManagerApi() {
+    public static Camera2SetApi getCamera2ManagerApi() {
         return camera2ManagerApi;
     }
 
