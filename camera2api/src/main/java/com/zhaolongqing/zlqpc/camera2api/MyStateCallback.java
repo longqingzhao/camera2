@@ -5,9 +5,9 @@ import android.support.annotation.NonNull;
 
 public class MyStateCallback extends CameraDevice.StateCallback {
 
-    private Camera2SetApi controlCamera;
+    private Camera2ManagerApi controlCamera;
 
-    public MyStateCallback(Camera2SetApi controlCamera) {
+    public MyStateCallback(Camera2ManagerApi controlCamera) {
         this.controlCamera = controlCamera;
     }
 
