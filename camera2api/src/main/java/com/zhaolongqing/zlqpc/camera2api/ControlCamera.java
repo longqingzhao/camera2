@@ -16,5 +16,4 @@ public interface ControlCamera {
     File stopRecord();
 
     void closeCamera();
-
 }

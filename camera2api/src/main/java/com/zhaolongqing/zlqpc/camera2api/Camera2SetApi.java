@@ -31,10 +31,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Camera2ManagerApi implements ControlCamera, CameraSet {
+public class Camera2SetApi implements ControlCamera, CameraSet {
 
-    private static final String TAG = "Camera2ManagerApi";
-    private static Camera2ManagerApi camera2ManagerApi = new Camera2ManagerApi();
+    private static final String TAG = "Camera2SetApi";
+    private static Camera2SetApi camera2ManagerApi = new Camera2SetApi();
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
     private WeakReference<Activity> activityWeakReference;
@@ -46,7 +46,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet {
     private CaptureRequest.Builder mPreviewBuilder;
     private String absolutePath;
 
-    public static Camera2ManagerApi getCamera2ManagerApi() {
+    public static Camera2SetApi getCamera2ManagerApi() {
         return camera2ManagerApi;
     }
 
@@ -69,7 +69,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet {
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             if (map != null) {
                 size = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
-                textureViewWeakReference.get().setAspectRatio(size.getHeight(), size.getWidth());
+                textureViewWeakReference.get().setAspectRatio(size.getWidth(), size.getHeight());
                 mediaRecorder = new MediaRecorder();
                 cameraManager.openCamera(cameraId, new MyStateCallback(this), null);
             }
@@ -97,7 +97,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet {
             List<Surface> surfaces = new ArrayList<>();
             mPreviewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             SurfaceTexture surfaceTexture = textureViewWeakReference.get().getSurfaceTexture();
-            surfaceTexture.setDefaultBufferSize(size.getHeight(), size.getWidth());
+            surfaceTexture.setDefaultBufferSize(size.getWidth(), size.getHeight());
             Surface surface = new Surface(surfaceTexture);
             surfaces.add(surface);
             mPreviewBuilder.addTarget(surface);
@@ -133,7 +133,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet {
         mediaRecorder.setOutputFile(absolutePath);
         mediaRecorder.setVideoEncodingBitRate(10000000);
         mediaRecorder.setVideoFrameRate(30);
-        mediaRecorder.setVideoSize(size.getHeight(), size.getWidth());
+        mediaRecorder.setVideoSize(size.getWidth(), size.getHeight());
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         try {
@@ -209,15 +209,13 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet {
      * Stops the background thread and its {@link Handler}.
      */
     private void stopBackgroundThread() {
-        if (mBackgroundThread != null) {
-            mBackgroundThread.quitSafely();
-            try {
-                mBackgroundThread.join();
-                mBackgroundThread = null;
-                mBackgroundHandler = null;
-            } catch (Exception e) {
-                Logger.t(TAG).e(new Throwable(), "stopBackgroundThread:%s", e);
-            }
+        mBackgroundThread.quitSafely();
+        try {
+            mBackgroundThread.join();
+            mBackgroundThread = null;
+            mBackgroundHandler = null;
+        } catch (Exception e) {
+            Logger.t(TAG).e(new Throwable(), "stopBackgroundThread:%s", e);
         }
     }
 
