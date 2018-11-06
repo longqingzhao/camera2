@@ -5,15 +5,22 @@ import android.app.Activity;
 import java.io.File;
 
 public interface ControlCamera {
-    void initCamera(Activity activity, AutoFitTextureView autoFitTextureView);
+    void initCamera(Activity activity, AutoFitTextureView autoFitTextureView, int cameraId);
 
     void openCamera();
 
-    void controlCamera(boolean isRecord);
+    void controlCamera();
 
-    File takePicture();
+    void takePicture(PictureFileListener pictureFileListener);
+
+    void startRecord();
 
     File stopRecord();
 
+    void snapPicture(Activity activity, AutoFitTextureView autoFitTextureView,PictureFileListener pictureFileListener);
+
+    void snapVideo(Activity activity, AutoFitTextureView autoFitTextureView);
+
     void closeCamera();
+
 }

@@ -15,15 +15,12 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
     private CameraSet cameraSet;
     private final CaptureRequest.Builder builder;
     private final Handler handler;
-    private boolean isRecord;
-    private MediaRecorder mediaRecorder;
+    public static final int CONFIG = 1234;
 
-    public MySessionStateCallback(CameraSet cameraSet, CaptureRequest.Builder builder, Handler handler, boolean isRecord, MediaRecorder mediaRecorder) {
+    MySessionStateCallback(CameraSet cameraSet, CaptureRequest.Builder builder, Handler handler) {
         this.cameraSet = cameraSet;
         this.builder = builder;
         this.handler = handler;
-        this.isRecord = isRecord;
-        this.mediaRecorder = mediaRecorder;
     }
 
     @Override
@@ -31,15 +28,14 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
         cameraSet.setSession(session);
         try {
             session.setRepeatingRequest(builder.build(), null, handler);
+            handler.sendEmptyMessage(CONFIG);
         } catch (CameraAccessException e) {
             Logger.t(TAG).e(new Throwable(), "onConfigured:%s", e);
         }
-        if (isRecord)
-            mediaRecorder.start();
     }
 
     @Override
     public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-
+        Logger.t(TAG).d("onConfigureFailed:");
     }
 }

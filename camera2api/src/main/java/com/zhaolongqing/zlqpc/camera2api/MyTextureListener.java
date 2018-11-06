@@ -7,7 +7,7 @@ public class MyTextureListener implements TextureView.SurfaceTextureListener {
 
     private ControlCamera controlCamera;
 
-    public MyTextureListener(ControlCamera controlCamera) {
+    MyTextureListener(ControlCamera controlCamera) {
         this.controlCamera = controlCamera;
     }
 
