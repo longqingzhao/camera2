@@ -79,19 +79,21 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
 
 
     @Override
-    public void snapPicture(Activity activity, AutoFitTextureView autoFitTextureView, PictureFileListener pictureFileListener) {
+    public void snapPicture(Activity activity, AutoFitTextureView autoFitTextureView, PictureFileListener pictureFileListener, int switchCamera) {
         this.activityWeakReference = new WeakReference<>(activity);
         this.textureViewWeakReference = new WeakReference<>(autoFitTextureView);
         this.pictureFileListener = pictureFileListener;
         this.isSnapCapture = true;
+        this.witchCamera = switchCamera;
         autoFitTextureView.setSurfaceTextureListener(new MyTextureListener(this));
     }
 
     @Override
-    public void snapVideo(Activity activity, AutoFitTextureView autoFitTextureView) {
+    public void snapVideo(Activity activity, AutoFitTextureView autoFitTextureView, int switchCamera) {
         this.activityWeakReference = new WeakReference<>(activity);
         this.textureViewWeakReference = new WeakReference<>(autoFitTextureView);
         this.isSnapRecord = true;
+        this.witchCamera = switchCamera;
         autoFitTextureView.setSurfaceTextureListener(new MyTextureListener(this));
     }
 

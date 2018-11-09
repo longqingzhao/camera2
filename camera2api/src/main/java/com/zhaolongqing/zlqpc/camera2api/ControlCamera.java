@@ -16,13 +16,13 @@ public interface ControlCamera {
     void startRecord();
 
     //快照
-    void snapPicture(Activity activity, AutoFitTextureView autoFitTextureView,PictureFileListener pictureFileListener);
+    void snapPicture(Activity activity, AutoFitTextureView autoFitTextureView,PictureFileListener pictureFileListener,int switchCamera);
 
     //停止摄像
     File stopRecord();
 
     //快视频
-    void snapVideo(Activity activity, AutoFitTextureView autoFitTextureView);
+    void snapVideo(Activity activity, AutoFitTextureView autoFitTextureView,int switchCamera);
 
     //关闭照相机
     void closeCamera();
