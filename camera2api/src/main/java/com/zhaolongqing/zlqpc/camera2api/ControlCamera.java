@@ -5,22 +5,30 @@ import android.app.Activity;
 import java.io.File;
 
 public interface ControlCamera {
+
+    //初始化
     void initCamera(Activity activity, AutoFitTextureView autoFitTextureView, int cameraId);
+
+    //拍照
+    void takePicture(PictureFileListener pictureFileListener);
+
+    //开始摄像
+    void startRecord();
+
+    //快照
+    void snapPicture(Activity activity, AutoFitTextureView autoFitTextureView,PictureFileListener pictureFileListener);
+
+    //停止摄像
+    File stopRecord();
+
+    //快视频
+    void snapVideo(Activity activity, AutoFitTextureView autoFitTextureView);
+
+    //关闭照相机
+    void closeCamera();
+
 
     void openCamera();
 
     void controlCamera();
-
-    void takePicture(PictureFileListener pictureFileListener);
-
-    void startRecord();
-
-    File stopRecord();
-
-    void snapPicture(Activity activity, AutoFitTextureView autoFitTextureView,PictureFileListener pictureFileListener);
-
-    void snapVideo(Activity activity, AutoFitTextureView autoFitTextureView);
-
-    void closeCamera();
-
 }

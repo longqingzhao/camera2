@@ -1,1 +1,1 @@
-include ':camera2api', ':myapplication', 'circlesport', 'waterwave', ':Application'
+include ':camera2api', ':myapplication', ':qiniulive', ':javaTextlib', ':testapplication', 'circlesport', 'waterwave'
