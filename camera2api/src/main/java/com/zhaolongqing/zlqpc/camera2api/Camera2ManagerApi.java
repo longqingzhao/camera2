@@ -85,7 +85,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
         this.pictureFileListener = pictureFileListener;
         this.isSnapCapture = true;
         this.witchCamera = switchCamera;
-        autoFitTextureView.setSurfaceTextureListener(new MyTextureListener(this));
+        openCamera();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
         this.textureViewWeakReference = new WeakReference<>(autoFitTextureView);
         this.isSnapRecord = true;
         this.witchCamera = switchCamera;
-        autoFitTextureView.setSurfaceTextureListener(new MyTextureListener(this));
+        openCamera();
     }
 
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener
@@ -176,13 +176,11 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             if (map != null) {
-                previewSize = Collections.min(Arrays.asList(map.getOutputSizes(MediaRecorder.class)), new CompareSizesByArea());
+                previewSize = getPreviewSize(map.getOutputSizes(MediaRecorder.class));
                 videoSize = Collections.max(Arrays.asList(map.getOutputSizes(MediaRecorder.class)), new CompareSizesByArea());
                 textureViewWeakReference.get().setAspectRatio(previewSize.getWidth(), previewSize.getHeight());
                 mediaRecorder = new MediaRecorder();
-                Size largest = Collections.max(
-                        Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-                        new CompareSizesByArea());
+                Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)), new CompareSizesByArea());
                 imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
                         ImageFormat.JPEG, /*maxImages*/2);
                 imageReader.setOnImageAvailableListener(
@@ -194,6 +192,17 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
         }
 
 
+    }
+
+    private Size getPreviewSize(Size[] outputSizes) {
+        final int width = textureViewWeakReference.get().getWidth();
+        Size size = null;
+        for (Size s : outputSizes) {
+            if (s.getWidth() > width && size == null || (size != null && size.getWidth() < s.getWidth())) {
+                size = s;
+            }
+        }
+        return size;
     }
 
     @Override
@@ -299,11 +308,9 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             mediaRecorder.release();
             mediaRecorder = null;
         }
-        File file = new File(absolutePath);
-        if (file.delete()) {
-            Logger.t(TAG).d("%s", "delete");
-        }
         stopBackgroundThread();
+        mCaptureBuilder = null;
+        mPreviewBuilder = null;
     }
 
     private void closePreviewSession() {
@@ -365,11 +372,13 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     @Override
     public void lock() {
         try {
-            if (mCaptureBuilder == null) {
-                mCaptureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-                mCaptureBuilder.setTag("capture");
-                mCaptureBuilder.addTarget(imageReader.getSurface());
+            if (mCaptureBuilder != null) {
+                mCaptureBuilder = null;
             }
+            mCaptureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+            mCaptureBuilder.setTag("capture");
+            mCaptureBuilder.addTarget(imageReader.getSurface());
+            mCaptureBuilder.set(CaptureRequest.JPEG_ORIENTATION, 180);
             CaptureRequest captureRequest = mCaptureBuilder.build();
             mPreviewSession.capture(captureRequest, new MyCaptureSessionCallback(this, MyCaptureSessionCallback.TYPE.CAPTURE), mBackgroundHandler);
         } catch (CameraAccessException e) {
