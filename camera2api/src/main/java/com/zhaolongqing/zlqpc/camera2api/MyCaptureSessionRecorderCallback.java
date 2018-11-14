@@ -68,11 +68,6 @@ public class MyCaptureSessionRecorderCallback extends CameraCaptureSession.Captu
         }
     }
 
-    @Override
-    public void onCaptureBufferLost(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull Surface target, long frameNumber) {
-        super.onCaptureBufferLost(session, request, target, frameNumber);
-        Logger.t(TAG).d("%s", "onCaptureBufferLost");
-    }
 
     @Override
     public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
