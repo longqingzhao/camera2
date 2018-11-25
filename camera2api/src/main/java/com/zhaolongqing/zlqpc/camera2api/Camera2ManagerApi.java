@@ -18,12 +18,11 @@ import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
-
-import com.orhanobut.logger.Logger;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -137,14 +136,14 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
                 output = new FileOutputStream(mFile);
                 output.write(bytes);
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG, "ImageSaver", e);
             } finally {
                 mImage.close();
                 if (null != output) {
                     try {
                         output.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Log.e(TAG, "ImageSaver", e);
                     }
                 }
             }
@@ -188,7 +187,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
                 cameraManager.openCamera(cameraId, new MyStateCallback(this), null);
             }
         } catch (CameraAccessException e) {
-            Logger.t(TAG).e(new Throwable(), "openCamera:%s", e);
+            Log.e(TAG, "openCamera", e);
         }
 
 
@@ -228,7 +227,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
                             mBackgroundHandler),
                     mBackgroundHandler);
         } catch (CameraAccessException e) {
-            Logger.t(TAG).e(new Throwable(), "controlCamera:%s", e);
+            Log.e(TAG, "controlCamera", e);
         }
 
     }
@@ -251,7 +250,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
         try {
             mediaRecorder.prepare();
         } catch (IOException e) {
-            Logger.t(TAG).e(new Throwable(), "setUpMediaRecorder:%s", e);
+            Log.e(TAG, "setUpMediaRecorder", e);
         }
     }
 
@@ -281,7 +280,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             mPreviewSession.setRepeatingBurst(Arrays.asList(mRecorderBuilder.build(), mPreviewBuilder.build()),
                     new MyCaptureSessionCallback(mediaRecorder, this, MyCaptureSessionCallback.TYPE.VIDEO), mBackgroundHandler);
         } catch (CameraAccessException e) {
-            Logger.t(TAG).e(new Throwable(), "lock:%s", e);
+            Log.e(TAG, "startRecord", e);
         }
     }
 
@@ -292,7 +291,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             mPreviewSession.stopRepeating();
             mPreviewSession.abortCaptures();
         } catch (CameraAccessException e) {
-            Logger.t(TAG).e(new Throwable(), "stopRecord:%s", e);
+            Log.e(TAG, "stopRecord", e);
         }
         return new File(path);
     }
@@ -353,7 +352,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
                 mBackgroundThread = null;
                 mBackgroundHandler = null;
             } catch (Exception e) {
-                Logger.t(TAG).e(new Throwable(), "stopBackgroundThread:%s", e);
+                Log.e(TAG, "stopBackgroundThread", e);
             }
         }
     }
@@ -382,7 +381,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             CaptureRequest captureRequest = mCaptureBuilder.build();
             mPreviewSession.capture(captureRequest, new MyCaptureSessionCallback(this, MyCaptureSessionCallback.TYPE.CAPTURE), mBackgroundHandler);
         } catch (CameraAccessException e) {
-            Logger.t(TAG).e(new Throwable(), "lock:%s", e);
+            Log.e(TAG, "lock", e);
         }
     }
 
@@ -392,12 +391,17 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             mPreviewSession.abortCaptures();
             mPreviewSession.stopRepeating();
             mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, mBackgroundHandler);
-            if (pictureFile != null)
-                pictureFileListener.success(pictureFile);
-            else
-                pictureFileListener.error();
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    if (pictureFile != null)
+                        pictureFileListener.success(pictureFile);
+                    else
+                        pictureFileListener.error();
+                }
+            });
         } catch (CameraAccessException e) {
-            Logger.t(TAG).e(new Throwable(), "unlock:%s", e);
+            Log.e(TAG, "unLock", e);
         }
     }
 
