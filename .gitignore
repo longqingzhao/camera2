@@ -9,10 +9,10 @@
 /build
 /captures
 .externalNativeBuild
-circlesport
-download
-javaTextlib
-myapplication
-qiniulive
-waterwave
-test
+/circlesport
+/download
+/javaTextlib
+/myapplication
+/qiniulive
+/waterwave
+/test
