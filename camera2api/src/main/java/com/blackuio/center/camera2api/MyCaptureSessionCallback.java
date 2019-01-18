@@ -1,4 +1,4 @@
-package com.zhaolongqing.zlqpc.camera2api;
+package com.blackuio.center.camera2api;
 
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CaptureFailure;
@@ -7,9 +7,6 @@ import android.hardware.camera2.CaptureResult;
 import android.hardware.camera2.TotalCaptureResult;
 import android.media.MediaRecorder;
 import android.support.annotation.NonNull;
-import android.view.Surface;
-
-import com.orhanobut.logger.Logger;
 
 public class MyCaptureSessionCallback extends CameraCaptureSession.CaptureCallback {
 
@@ -41,25 +38,25 @@ public class MyCaptureSessionCallback extends CameraCaptureSession.CaptureCallba
     @Override
     public void onCaptureStarted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, long timestamp, long frameNumber) {
         super.onCaptureStarted(session, request, timestamp, frameNumber);
-        Logger.t(TAG).d("%s", "onCaptureStarted");
+        Log.g(TAG, "onCaptureStarted");
     }
 
     @Override
     public void onCaptureProgressed(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull CaptureResult partialResult) {
         super.onCaptureProgressed(session, request, partialResult);
-        Logger.t(TAG).d("%s", "onCaptureProgressed");
+        Log.g(TAG, "onCaptureProgressed");
     }
 
     @Override
     public void onCaptureFailed(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull CaptureFailure failure) {
         super.onCaptureFailed(session, request, failure);
-        Logger.t(TAG).d("%s", "onCaptureFailed");
+        Log.g(TAG, "onCaptureFailed");
     }
 
     @Override
     public void onCaptureSequenceCompleted(@NonNull CameraCaptureSession session, int sequenceId, long frameNumber) {
         super.onCaptureSequenceCompleted(session, sequenceId, frameNumber);
-        Logger.t(TAG).d("%s", "onCaptureSequenceCompleted");
+        Log.g(TAG, "onCaptureSequenceCompleted");
         if (!isFirst && TYPE.VIDEO == type && mediaRecorder != null && controlCamera != null) {
             mediaRecorder.stop();
             mediaRecorder.reset();
@@ -71,7 +68,7 @@ public class MyCaptureSessionCallback extends CameraCaptureSession.CaptureCallba
     @Override
     public void onCaptureSequenceAborted(@NonNull CameraCaptureSession session, int sequenceId) {
         super.onCaptureSequenceAborted(session, sequenceId);
-        Logger.t(TAG).d("%s", "onCaptureSequenceAborted");
+        Log.g(TAG, "onCaptureSequenceAborted");
     }
 
 

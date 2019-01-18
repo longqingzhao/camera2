@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.zhaolongqing.zlqpc.camera2api;
+package com.blackuio.center.camera2api;
 
 import android.content.Context;
 import android.util.AttributeSet;

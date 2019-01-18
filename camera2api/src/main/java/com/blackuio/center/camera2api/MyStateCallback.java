@@ -1,9 +1,7 @@
-package com.zhaolongqing.zlqpc.camera2api;
+package com.blackuio.center.camera2api;
 
 import android.hardware.camera2.CameraDevice;
 import android.support.annotation.NonNull;
-
-import com.orhanobut.logger.Logger;
 
 public class MyStateCallback extends CameraDevice.StateCallback {
 
@@ -22,11 +20,11 @@ public class MyStateCallback extends CameraDevice.StateCallback {
 
     @Override
     public void onDisconnected(@NonNull CameraDevice camera) {
-        Logger.t(TAG).d("onDisconnected");
+        Log.g(TAG,"onDisconnected");
     }
 
     @Override
     public void onError(@NonNull CameraDevice camera, int error) {
-        Logger.t(TAG).d("onError");
+        Log.g(TAG,"onError");
     }
 }

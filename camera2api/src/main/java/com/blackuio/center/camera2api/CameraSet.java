@@ -1,4 +1,4 @@
-package com.zhaolongqing.zlqpc.camera2api;
+package com.blackuio.center.camera2api;
 
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraDevice;

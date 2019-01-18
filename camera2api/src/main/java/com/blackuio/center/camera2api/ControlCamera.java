@@ -1,4 +1,4 @@
-package com.zhaolongqing.zlqpc.camera2api;
+package com.blackuio.center.camera2api;
 
 import android.app.Activity;
 
@@ -26,6 +26,9 @@ public interface ControlCamera {
 
     //关闭照相机
     void closeCamera();
+
+    //角度
+    void cameraAngle(int angle);
 
 
     void openCamera();

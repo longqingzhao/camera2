@@ -1,13 +1,10 @@
-package com.zhaolongqing.zlqpc.camera2api;
+package com.blackuio.center.camera2api;
 
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CaptureRequest;
-import android.media.MediaRecorder;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-
-import com.orhanobut.logger.Logger;
 
 public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
 
@@ -15,7 +12,7 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
     private CameraSet cameraSet;
     private final CaptureRequest.Builder builder;
     private final Handler handler;
-    public static final int CONFIG = 1234;
+    static final int CONFIG = 1234;
 
     MySessionStateCallback(CameraSet cameraSet, CaptureRequest.Builder builder, Handler handler) {
         this.cameraSet = cameraSet;
@@ -30,12 +27,13 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
             session.setRepeatingRequest(builder.build(), null, handler);
             handler.sendEmptyMessage(CONFIG);
         } catch (CameraAccessException e) {
-            Logger.t(TAG).e(new Throwable(), "onConfigured:%s", e);
+            Log.e(TAG, "onConfigured", e);
         }
     }
 
     @Override
     public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-        Logger.t(TAG).d("onConfigureFailed:");
+        Log.g(TAG, "onConfigureFailed-->session:" + session);
+
     }
 }
