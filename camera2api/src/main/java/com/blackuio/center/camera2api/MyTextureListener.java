@@ -25,12 +25,12 @@ public class MyTextureListener implements TextureView.SurfaceTextureListener {
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.g(TAG, "onSurfaceTextureDestroyed");
+        Log.g(TAG, "onSurfaceTextureDestroyed");//
         return false;
     }
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        Log.g(TAG, "onSurfaceTextureUpdated");
+//        Log.g(TAG, "onSurfaceTextureUpdated");
     }
 }

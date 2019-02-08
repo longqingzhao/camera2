@@ -1,21 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 22
-        targetSdkVersion 23
-        versionCode 4
-        versionName "4.6"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 5
+        versionName "5.0"
     }
 }
 
-dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:23.4.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.tencent.bugly:crashreport:2.6.6.1'
-    implementation 'com.tencent.bugly:nativecrashreport:3.3.1'
-}

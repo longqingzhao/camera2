@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
-import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
@@ -25,7 +24,6 @@ import android.view.Surface;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
@@ -65,6 +63,8 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
 
     //状态
     private boolean isSessionOk = false;
+    private boolean isRecord;
+    private CaptureRequest.Builder mRecorderBuilder;
 
     public static Camera2ManagerApi getCamera2ManagerApi() {
         return camera2ManagerApi;
@@ -74,8 +74,8 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     public void initCamera(Activity activity, AutoFitTextureView autoFitTextureView, int witchCamera) {
         this.activityWeakReference = new WeakReference<>(activity);
         this.textureViewWeakReference = new WeakReference<>(autoFitTextureView);
-        autoFitTextureView.setSurfaceTextureListener(new MyTextureListener(this));
         this.witchCamera = witchCamera;
+        autoFitTextureView.setSurfaceTextureListener(new MyTextureListener(this));
     }
 
 
@@ -139,7 +139,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             buffer.get(bytes);
             try (FileOutputStream output = new FileOutputStream(mFile)) {
                 output.write(bytes);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "ImageSaver", e);
                 camera2ManagerApi.pictureFileListener.error();
             } finally {
@@ -181,12 +181,11 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
                     Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)), new CompareSizesByArea());
                     imageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
                             ImageFormat.JPEG, /*maxImages*/2);
-                    imageReader.setOnImageAvailableListener(
-                            mOnImageAvailableListener, mBackgroundHandler);
+                    imageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
                     cameraManager.openCamera(cameraId, new MyStateCallback(this), null);
                 }
             }
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             Log.e(TAG, "openCamera", e);
             if (isSnapCapture) {
                 pictureFileListener.error();
@@ -211,7 +210,6 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     public void controlCamera() {
         closePreviewSession();
         try {
-            setUpMediaRecorder();
             List<Surface> surfaces = new ArrayList<>();
             mPreviewBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             SurfaceTexture surfaceTexture = textureViewWeakReference.get().getSurfaceTexture();
@@ -221,22 +219,13 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
                 surfaces.add(textureSurface);
                 surfaces.add(imageReader.getSurface());
                 mPreviewBuilder.addTarget(textureSurface);
-                if (mediaRecorder != null) {
-                    Surface recorderSurface = mediaRecorder.getSurface();
-                    surfaces.add(recorderSurface);
-                    mPreviewBuilder.addTarget(recorderSurface);
-                    mPreviewBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-                    cameraDevice.createCaptureSession(surfaces,
-                            new MySessionStateCallback(this,
-                                    mPreviewBuilder,
-                                    mBackgroundHandler),
-                            mBackgroundHandler);
-                }
+                mPreviewBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+                cameraDevice.createCaptureSession(surfaces, new MySessionStateCallback(this, mPreviewBuilder, mBackgroundHandler), mBackgroundHandler);
             } else {
                 if (pictureFileListener != null)
                     pictureFileListener.error();
             }
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             Log.e(TAG, "controlCamera", e);
             if (isSnapCapture) {
                 pictureFileListener.error();
@@ -263,7 +252,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             try {
                 mediaRecorder.prepare();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "setUpMediaRecorder", e);
                 if (isSnapCapture) {
                     pictureFileListener.error();
@@ -288,16 +277,20 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     @Override
     public void startRecord() {
         try {
-            CaptureRequest.Builder mRecorderBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-            mRecorderBuilder.setTag("record");
+            closePreviewSession();
+            setUpMediaRecorder();
+            mRecorderBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mRecorderBuilder.addTarget(mediaRecorder.getSurface());
+            SurfaceTexture surfaceTexture = textureViewWeakReference.get().getSurfaceTexture();
+            if (surfaceTexture != null && previewSize.getHeight() < previewSize.getWidth()) {
+                surfaceTexture.setDefaultBufferSize(previewSize.getHeight(), previewSize.getWidth());
+                textureSurface = new Surface(surfaceTexture);
+            }
             mRecorderBuilder.addTarget(textureSurface);
             mRecorderBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-            if (mPreviewSession != null && mPreviewBuilder != null && mBackgroundHandler != null) {
-                mPreviewSession.setRepeatingBurst(Arrays.asList(mRecorderBuilder.build(), mPreviewBuilder.build()),
-                        new MyCaptureSessionCallback(mediaRecorder, this, MyCaptureSessionCallback.TYPE.VIDEO), mBackgroundHandler);
-            }
-        } catch (CameraAccessException e) {
+            cameraDevice.createCaptureSession(Arrays.asList(mediaRecorder.getSurface(), textureSurface), new MySessionStateCallback(this, mRecorderBuilder, mBackgroundHandler), mBackgroundHandler);
+            isRecord = true;
+        } catch (Exception e) {
             Log.e(TAG, "startRecord", e);
             if (isSnapCapture) {
                 pictureFileListener.error();
@@ -307,12 +300,15 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
 
     @Override
     public synchronized File stopRecord() {
+        Log.g(TAG, "textureView--surface:" + textureViewWeakReference.get().toString());
         if (mPreviewSession != null && mPreviewBuilder != null && mBackgroundHandler != null) {
+            isRecord = false;
             final String path = absolutePath;
             try {
-                mPreviewSession.stopRepeating();
-                mPreviewSession.abortCaptures();
-            } catch (CameraAccessException e) {
+//                mPreviewSession.stopRepeating();
+                controlCamera();
+//                mPreviewSession.abortCaptures();
+            } catch (Exception e) {
                 Log.e(TAG, "stopRecord", e);
             }
             isSnapRecord = false;
@@ -402,21 +398,34 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     public void setSession(CameraCaptureSession cameraCaptureSession) {
         this.mPreviewSession = cameraCaptureSession;
         isSessionOk = true;
+        if (isRecord) {
+            try {
+                mRecorderBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+                mRecorderBuilder.setTag("record");
+                mRecorderBuilder.addTarget(textureSurface);
+                mRecorderBuilder.addTarget(mediaRecorder.getSurface());
+                mRecorderBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
+                mPreviewSession.setRepeatingBurst(Collections.singletonList(mRecorderBuilder.build()), new MyCaptureSessionRecorderCallback(mediaRecorder, this), mBackgroundHandler);
+            } catch (Exception e) {
+                Log.e(TAG, "CameraAccessException", e);
+            }
+        }
     }
 
     @Override
     public void lock() {
         try {
-            if (mCaptureBuilder != null) {
-                mCaptureBuilder = null;
+            if (mCaptureBuilder == null) {
+                mCaptureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+                mCaptureBuilder.setTag("capture");
+                mCaptureBuilder.addTarget(imageReader.getSurface());
             }
-            mCaptureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            mCaptureBuilder.setTag("capture");
-            mCaptureBuilder.addTarget(imageReader.getSurface());
-//            mCaptureBuilder.set(CaptureRequest.JPEG_ORIENTATION, 180);
+//            mCaptureBuilder.set(CaptureRequest.JPEG_ORIENTATION, 90);
             CaptureRequest captureRequest = mCaptureBuilder.build();
+            mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, mBackgroundHandler);
+            mPreviewSession.stopRepeating();
             mPreviewSession.capture(captureRequest, new MyCaptureSessionCallback(this, MyCaptureSessionCallback.TYPE.CAPTURE), mBackgroundHandler);
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             Log.e(TAG, "lock", e);
             pictureFileListener.error();
         }
@@ -425,8 +434,8 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     @Override
     public void unLock() {
         try {
-            mPreviewSession.abortCaptures();
-            mPreviewSession.stopRepeating();
+//            mPreviewSession.abortCaptures();
+//            mPreviewSession.stopRepeating();
             mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, mBackgroundHandler);
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
@@ -437,7 +446,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
                         pictureFileListener.error();
                 }
             });
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             Log.e(TAG, "unLock", e);
             pictureFileListener.error();
         }

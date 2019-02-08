@@ -1,5 +1,6 @@
 package com.blackuio.center.camera2api;
 
+import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
@@ -62,6 +63,9 @@ public class MyCaptureSessionCallback extends CameraCaptureSession.CaptureCallba
             mediaRecorder.reset();
             controlCamera.controlCamera();
             isFirst = true;
+        } else if (type == TYPE.CAPTURE) {
+            //解除lock
+            captureCall.unLock();
         }
     }
 
@@ -75,14 +79,9 @@ public class MyCaptureSessionCallback extends CameraCaptureSession.CaptureCallba
     @Override
     public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
         super.onCaptureCompleted(session, request, result);
-        if (type == TYPE.CAPTURE) {
-            //解除lock
-            captureCall.unLock();
-        } else {
-            if (isFirst && type == TYPE.VIDEO && mediaRecorder != null) {
-                mediaRecorder.start();
-                isFirst = false;
-            }
+        if (isFirst && type == TYPE.VIDEO && mediaRecorder != null) {
+            mediaRecorder.start();
+            isFirst = false;
         }
     }
 

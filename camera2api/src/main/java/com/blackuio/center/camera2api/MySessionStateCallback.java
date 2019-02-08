@@ -22,13 +22,13 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
 
     @Override
     public void onConfigured(@NonNull CameraCaptureSession session) {
-        cameraSet.setSession(session);
         try {
             session.setRepeatingRequest(builder.build(), null, handler);
             handler.sendEmptyMessage(CONFIG);
         } catch (CameraAccessException e) {
             Log.e(TAG, "onConfigured", e);
         }
+        cameraSet.setSession(session);
     }
 
     @Override

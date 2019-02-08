@@ -3,20 +3,11 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <compositeConfiguration>
+          <compositeBuild compositeDefinitionSource="SCRIPT" />
+        </compositeConfiguration>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/camera2api" />
-            <option value="$PROJECT_DIR$/circlesport" />
-            <option value="$PROJECT_DIR$/download" />
-            <option value="$PROJECT_DIR$/javaTextlib" />
-            <option value="$PROJECT_DIR$/myapplication" />
-            <option value="$PROJECT_DIR$/test" />
-            <option value="$PROJECT_DIR$/waterwave" />
-          </set>
-        </option>
         <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
