@@ -4,7 +4,7 @@ import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CaptureRequest;
 import android.os.Handler;
-import android.support.annotation.NonNull;
+
 
 public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
 
@@ -21,7 +21,7 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
     }
 
     @Override
-    public void onConfigured(@NonNull CameraCaptureSession session) {
+    public void onConfigured( CameraCaptureSession session) {
         try {
             session.setRepeatingRequest(builder.build(), null, handler);
             handler.sendEmptyMessage(CONFIG);
@@ -32,7 +32,7 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
     }
 
     @Override
-    public void onConfigureFailed(@NonNull CameraCaptureSession session) {
+    public void onConfigureFailed( CameraCaptureSession session) {
         Log.g(TAG, "onConfigureFailed-->session:" + session);
 
     }
