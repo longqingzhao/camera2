@@ -21,6 +21,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Size;
 import android.view.Surface;
+import android.view.ViewGroup;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,6 +61,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     private Surface textureSurface;
     private boolean isSnapCapture = false;
     private boolean isSnapRecord = false;
+    private CameraConfigureCallBack cameraConfigureCallBack;
 
     //状态
     private boolean isSessionOk = false;
@@ -68,6 +70,10 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
 
     public static Camera2ManagerApi getCamera2ManagerApi() {
         return camera2ManagerApi;
+    }
+
+    public void setCameraConfigureCallBack(CameraConfigureCallBack cameraConfigureCallBack) {
+        this.cameraConfigureCallBack = cameraConfigureCallBack;
     }
 
     @Override
@@ -202,6 +208,12 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             if (s.getWidth() > width && size == null || (size != null && size.getWidth() < s.getWidth())) {
                 size = s;
             }
+        }
+        if (size == null) {
+            ViewGroup.LayoutParams layoutParams = cameraConfigureCallBack.getLayoutParams(outputSizes[0].getWidth(), outputSizes[0].getHeight());
+            textureViewWeakReference.get().setLayoutParams(layoutParams);
+            textureViewWeakReference.get().requestLayout();
+            return outputSizes[0];
         }
         return size;
     }
@@ -451,6 +463,10 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             pictureFileListener.error();
         }
         isSnapCapture = false;
+    }
+
+    public interface CameraConfigureCallBack {
+        ViewGroup.LayoutParams getLayoutParams(int width, int height);
     }
 
 }
