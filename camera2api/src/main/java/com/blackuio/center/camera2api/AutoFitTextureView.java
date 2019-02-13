@@ -17,7 +17,9 @@
 package com.blackuio.center.camera2api;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.TextureView;
 
 /**
@@ -62,15 +64,21 @@ public class AutoFitTextureView extends TextureView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
+        int newWidth;
+        int newHeight;
         if (0 == mRatioWidth || 0 == mRatioHeight) {
-            setMeasuredDimension(width, height);
+            newWidth = width;
+            newHeight = height;
         } else {
             if (width < height * mRatioWidth / mRatioHeight) {
-                setMeasuredDimension(width, width * mRatioHeight / mRatioWidth);
+                newWidth = width;
+                newHeight = width * mRatioHeight / mRatioWidth;
             } else {
-                setMeasuredDimension(height * mRatioWidth / mRatioHeight, height);
+                newWidth = height * mRatioWidth / mRatioHeight;
+                newHeight = height;
             }
         }
+        setMeasuredDimension(newWidth, newHeight);
     }
 
 }

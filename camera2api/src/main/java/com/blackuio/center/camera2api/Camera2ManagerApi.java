@@ -210,9 +210,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             }
         }
         if (size == null) {
-            ViewGroup.LayoutParams layoutParams = cameraConfigureCallBack.getLayoutParams(outputSizes[0].getWidth(), outputSizes[0].getHeight());
-            textureViewWeakReference.get().setLayoutParams(layoutParams);
-            textureViewWeakReference.get().requestLayout();
+            cameraConfigureCallBack.setLayoutParams(outputSizes[0].getWidth(), outputSizes[0].getHeight());
             return outputSizes[0];
         }
         return size;
@@ -466,7 +464,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     }
 
     public interface CameraConfigureCallBack {
-        ViewGroup.LayoutParams getLayoutParams(int width, int height);
+        void setLayoutParams(int width, int height);
     }
 
 }
