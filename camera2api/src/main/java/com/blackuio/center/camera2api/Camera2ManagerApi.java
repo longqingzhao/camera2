@@ -21,7 +21,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Size;
 import android.view.Surface;
-import android.view.ViewGroup;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -255,8 +254,8 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             absolutePath = getVideoFilePath(true);
             mediaRecorder.setOutputFile(absolutePath);
-            mediaRecorder.setVideoEncodingBitRate(Integer.MAX_VALUE);
-            mediaRecorder.setVideoFrameRate(30);
+            mediaRecorder.setVideoEncodingBitRate(900 * 1024);
+            mediaRecorder.setVideoFrameRate(12);
             mediaRecorder.setVideoSize(videoSize.getWidth(), videoSize.getHeight());
             mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
@@ -313,15 +312,13 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
         Log.g(TAG, "textureView--surface:" + textureViewWeakReference.get().toString());
         if (mPreviewSession != null && mPreviewBuilder != null && mBackgroundHandler != null) {
             isRecord = false;
-            final String path = absolutePath;
             try {
-//                mPreviewSession.stopRepeating();
                 controlCamera();
-//                mPreviewSession.abortCaptures();
             } catch (Exception e) {
                 Log.e(TAG, "stopRecord", e);
             }
             isSnapRecord = false;
+            final String path = absolutePath;
             return new File(path);
         }
         isSnapRecord = false;
