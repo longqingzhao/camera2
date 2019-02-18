@@ -21,10 +21,11 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
     }
 
     @Override
-    public void onConfigured( CameraCaptureSession session) {
+    public void onConfigured(CameraCaptureSession session) {
         try {
             session.setRepeatingRequest(builder.build(), null, handler);
-            handler.sendEmptyMessage(CONFIG);
+            if (handler != null)
+                handler.sendEmptyMessage(CONFIG);
         } catch (CameraAccessException e) {
             Log.e(TAG, "onConfigured", e);
         }
@@ -32,7 +33,7 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
     }
 
     @Override
-    public void onConfigureFailed( CameraCaptureSession session) {
+    public void onConfigureFailed(CameraCaptureSession session) {
         Log.g(TAG, "onConfigureFailed-->session:" + session);
 
     }

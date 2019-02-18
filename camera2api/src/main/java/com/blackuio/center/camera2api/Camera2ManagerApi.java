@@ -297,7 +297,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
             }
             mRecorderBuilder.addTarget(textureSurface);
             mRecorderBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
-            cameraDevice.createCaptureSession(Arrays.asList(mediaRecorder.getSurface(), textureSurface), new MySessionStateCallback(this, mRecorderBuilder, mBackgroundHandler), mBackgroundHandler);
+            cameraDevice.createCaptureSession(Arrays.asList(mediaRecorder.getSurface(), textureSurface), new MySessionStateCallback(this, mRecorderBuilder, null), mBackgroundHandler);
             isRecord = true;
         } catch (Exception e) {
             Log.e(TAG, "startRecord", e);
