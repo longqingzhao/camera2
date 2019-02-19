@@ -14,6 +14,7 @@ public class MyStateCallback extends CameraDevice.StateCallback {
 
     @Override
     public void onOpened( CameraDevice camera) {
+        Log.g(TAG,"onOpened");
         controlCamera.setCameraDevice(camera);
         controlCamera.controlCamera();
     }

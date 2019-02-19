@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
@@ -171,6 +172,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     @SuppressLint("MissingPermission")
     @Override
     public void openCamera() {
+        Log.g(TAG, "openCamera");
         startBackgroundThread();
         CameraManager cameraManager = (CameraManager) activityWeakReference.get().getSystemService(Context.CAMERA_SERVICE);
         try {
@@ -217,6 +219,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
 
     @Override
     public void controlCamera() {
+        Log.g(TAG, "controlCamera");
         closePreviewSession();
         try {
             List<Surface> surfaces = new ArrayList<>();
@@ -244,6 +247,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     }
 
     private void setUpMediaRecorder() {
+        Log.g(TAG, "setUpMediaRecorder");
         final Activity activity = activityWeakReference.get();
         if (null == activity) {
             return;
@@ -285,17 +289,23 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
 
     @Override
     public void startRecord() {
+        Log.g(TAG, "startRecord");
         try {
+            if (isSnapRecord) {
+                Thread.sleep(200);
+            }
             closePreviewSession();
             setUpMediaRecorder();
             mRecorderBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mRecorderBuilder.addTarget(mediaRecorder.getSurface());
             SurfaceTexture surfaceTexture = textureViewWeakReference.get().getSurfaceTexture();
             if (surfaceTexture != null && previewSize.getHeight() < previewSize.getWidth()) {
+                Log.g(TAG, "setDefaultBufferSize");
                 surfaceTexture.setDefaultBufferSize(previewSize.getHeight(), previewSize.getWidth());
                 textureSurface = new Surface(surfaceTexture);
             }
             mRecorderBuilder.addTarget(textureSurface);
+            Log.g(TAG, "addTarget");
             mRecorderBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
             cameraDevice.createCaptureSession(Arrays.asList(mediaRecorder.getSurface(), textureSurface), new MySessionStateCallback(this, mRecorderBuilder, null), mBackgroundHandler);
             isRecord = true;
@@ -313,11 +323,22 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
         if (mPreviewSession != null && mPreviewBuilder != null && mBackgroundHandler != null) {
             isRecord = false;
             try {
-                controlCamera();
+                if (isSnapRecord) {
+                    try {
+                        mPreviewSession.stopRepeating();
+                        mPreviewSession.abortCaptures();
+                    } catch (CameraAccessException e) {
+                        controlCamera();
+                    } catch (Exception e) {
+                        Log.e(TAG, "stopRecord", e);
+                    }
+                } else {
+                    controlCamera();
+                }
+                isSnapRecord = false;
             } catch (Exception e) {
                 Log.e(TAG, "stopRecord", e);
             }
-            isSnapRecord = false;
             final String path = absolutePath;
             return new File(path);
         }
@@ -347,6 +368,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
     }
 
     private synchronized void closePreviewSession() {
+        Log.g(TAG, "closePreviewSession");
         if (mPreviewSession != null) {
             mPreviewSession.close();
             mPreviewSession = null;
@@ -398,6 +420,7 @@ public class Camera2ManagerApi implements ControlCamera, CameraSet, CaptureCall 
 
     @Override
     public void setCameraDevice(CameraDevice cameraDevice) {
+        Log.g(TAG, "setCameraDevice");
         this.cameraDevice = cameraDevice;
     }
 

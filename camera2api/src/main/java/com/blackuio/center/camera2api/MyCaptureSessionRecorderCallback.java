@@ -46,7 +46,7 @@ public class MyCaptureSessionRecorderCallback extends CameraCaptureSession.Captu
         if (!isFirst) {
             mediaRecorder.stop();
             mediaRecorder.reset();
-            controlCamera.controlCamera();
+//            controlCamera.controlCamera();
             isFirst = true;
         }
     }

@@ -15,6 +15,7 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
     static final int CONFIG = 1234;
 
     MySessionStateCallback(CameraSet cameraSet, CaptureRequest.Builder builder, Handler handler) {
+        Log.g(TAG,"MySessionStateCallback");
         this.cameraSet = cameraSet;
         this.builder = builder;
         this.handler = handler;
@@ -22,10 +23,13 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
 
     @Override
     public void onConfigured(CameraCaptureSession session) {
+        Log.g(TAG,"onConfigured");
         try {
             session.setRepeatingRequest(builder.build(), null, handler);
-            if (handler != null)
+            if (handler != null){
+                Log.g(TAG,"sendEmptyMessage");
                 handler.sendEmptyMessage(CONFIG);
+            }
         } catch (CameraAccessException e) {
             Log.e(TAG, "onConfigured", e);
         }
@@ -35,6 +39,5 @@ public class MySessionStateCallback extends CameraCaptureSession.StateCallback {
     @Override
     public void onConfigureFailed(CameraCaptureSession session) {
         Log.g(TAG, "onConfigureFailed-->session:" + session);
-
     }
 }
